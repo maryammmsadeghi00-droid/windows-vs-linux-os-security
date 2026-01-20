@@ -65,4 +65,4 @@ A short demonstration video showing:
 - Log filtering (Warning / Error)
 - Alert generation for stopped services
 
-📁 **Location:** `docs/docs/Video_2026-01-20_180132.mp44`
+📁 **Location:** `docs/Video_2026-01-20_180132.mp44`
