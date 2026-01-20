@@ -1,59 +1,52 @@
 #!/usr/bin/env python3
 import subprocess
 import time
+import json
 
-# --- Configuration ---
 CRITICAL_SERVICES = ["Spooler", "wuauserv", "WinDefend"]
 CHECK_INTERVAL = 10  # seconds
 
 
-def run_powershell(command):
-    """Run PowerShell command and return output"""
+def run_powershell(command: str) -> str:
     try:
-        result = subprocess.check_output(
-            ["powershell", "-Command", command],
+        return subprocess.check_output(
+            ["powershell.exe", "-NoProfile", "-Command", command],
             stderr=subprocess.DEVNULL,
             text=True
-        )
-        return result.strip()
+        ).strip()
     except subprocess.CalledProcessError:
         return ""
 
 
 def list_services():
-    """List Windows services and their status"""
-    cmd = "Get-Service | Select-Object Name, Status"
-    output = run_powershell(cmd)
-    services = []
-    for line in output.splitlines()[2:]:
-        parts = line.split()
-        if len(parts) >= 2:
-            services.append({
-                "name": parts[0],
-                "status": parts[-1]
-            })
-    return services
+    cmd = "Get-Service | Select-Object Name, Status | ConvertTo-Json"
+    out = run_powershell(cmd)
+    if not out:
+        return []
+    data = json.loads(out)
+    if isinstance(data, dict):
+        data = [data]
+    return [{"name": s["Name"], "status": s["Status"]} for s in data]
 
 
-def check_critical_services():
-    """Check critical services and warn if stopped"""
-    for service in CRITICAL_SERVICES:
-        status = run_powershell(f"(Get-Service -Name {service}).Status")
-        if status.lower() != "running":
-            print(f"[ALERT] Critical service stopped: {service}")
+def get_service_status(name: str) -> str:
+    cmd = f"Try {{ (Get-Service -Name '{name}' -ErrorAction Stop).Status }} Catch {{ 'NOT_FOUND' }}"
+    return run_powershell(cmd)
 
 
-def eventlog_errors():
-    """Show recent warning and error logs"""
+def eventlog_errors(max_events: int = 10):
     cmd = (
-        "Get-WinEvent -LogName System -MaxEvents 10 | "
+        f"Get-WinEvent -LogName System -MaxEvents {max_events} | "
         "Where-Object {$_.LevelDisplayName -in @('Error','Warning')} | "
-        "Select-Object TimeCreated, LevelDisplayName, Message"
+        "Select-Object TimeCreated, LevelDisplayName, Message | ConvertTo-Json"
     )
-    logs = run_powershell(cmd)
-    if logs:
-        print("\n[EVENT LOGS - WARNING & ERROR]")
-        print(logs)
+    out = run_powershell(cmd)
+    if not out:
+        return []
+    data = json.loads(out)
+    if isinstance(data, dict):
+        data = [data]
+    return data
 
 
 def main():
@@ -64,11 +57,31 @@ def main():
     for s in services[:10]:
         print(f"{s['name']} -> {s['status']}")
 
-    eventlog_errors()
+    logs = eventlog_errors()
+    if logs:
+        print("\n[EVENT LOGS - WARNING & ERROR]")
+        for item in logs:
+            msg = (item.get("Message") or "").replace("\r", " ").replace("\n", " ")
+            print(f"{item.get('TimeCreated')} | {item.get('LevelDisplayName')} | {msg[:120]}...")
 
     print("\nMonitoring critical services...")
+    last_state = {}
     while True:
-        check_critical_services()
+        for service in CRITICAL_SERVICES:
+            status = get_service_status(service).lower()
+            prev = last_state.get(service)
+
+            if status == "not_found":
+                if prev != "not_found":
+                    print(f"[WARN] Critical service not found: {service}")
+                last_state[service] = "not_found"
+                continue
+
+            if status != "running" and prev != status:
+                print(f"[ALERT] Critical service not running: {service} (status={status})")
+
+            last_state[service] = status
+
         time.sleep(CHECK_INTERVAL)
 
 
