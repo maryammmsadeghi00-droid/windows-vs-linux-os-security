@@ -1,63 +1,68 @@
-# A Comparative Study of Security Mechanisms in Windows and Linux Operating Systems
+# Monitoring & Logging in Operating Systems  
+## Open Source OS – DevOps – SecOps
 
-This repository contains practical scripts used to analyze and compare
-security mechanisms in Windows and Linux operating systems.
+This repository contains simple and practical scripts designed to monitor **system services** and analyze **system logs** in operating systems, with a focus on **Monitoring & Logging concepts** used in **DevOps** and **SecOps** environments.
 
-## Topics Covered
-- User & Permission Management
-- Kernel Security
-- Update & Patch Management
-
-## Related Security Tools (Reference)
-Although this project focuses on operating system–level security mechanisms in Windows and Linux,
-some well-known SecOps and security assessment tools are listed below as references.
-
-These tools are not directly used in this project, but they are commonly applied in real-world
-security analysis environments.
-
-- Burp Suite – Web application security testing
-- OWASP ZAP – Open-source web vulnerability scanner
-- Nikto – Web server vulnerability scanner
-- SQLMap – Automated SQL injection testing tool
-- 
-## Structure
-- windows/: PowerShell scripts for Windows security analysis
-- linux/: Bash scripts for Linux security analysis
-
-## Author
-Student Project – OS Security
+The project demonstrates how operating system–level monitoring helps improve system reliability, detect failures, and support security operations.
 
 ---
 
-## How to Run (Local Test)
+## 🎯 Project Objective
 
-### Windows (PowerShell)
-1. Open **PowerShell** as Administrator.
-2. Navigate to the project directory:
-   ```powershell
-   cd "PATH_TO_PROJECT"
-3. Run the scripts:
+The main objective of this project is to:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\windows\user_permission.ps1
-powershell -ExecutionPolicy Bypass -File .\windows\kernel_security.ps1
-powershell -ExecutionPolicy Bypass -File .\windows\update_patch.ps1
+- Monitor system services in real time
+- Analyze system logs for warnings and errors
+- Generate alerts when critical services stop
+- Demonstrate basic Monitoring & Logging mechanisms at OS level
+- Connect operating system monitoring with DevOps and SecOps practices
 
 ---
 
-### Linux (Bash)
+## 📌 Topics Covered
 
-1. Open Terminal.
-2. Navigate to the project directory:
-```bash
-cd /path/to/project
-3. Make scripts executable:
-```bash
-chmod +x linux/*.sh
-./linux/user_permission.sh
-./linux/kernel_security.sh
-./linux/update_patch.sh
+- Monitoring & Logging  
+- Open Source Operating Systems  
+- DevOps fundamentals  
+- SecOps fundamentals  
+- Service Management (system services)
+
 ---
 
-This project was developed as a final assignment for the Open Source Operating Systems course.
+## 🔍 Features
 
+- Display active / inactive service status
+- Log filtering:
+  - Warning logs
+  - Error logs
+- Alert generation for stopped critical services
+- Lightweight and educational scripts
+- Suitable for local testing and learning purposes
+
+---
+
+## 🛠 Related DevOps & SecOps Tools (Reference)
+
+The following tools are **not directly used** in this project, but are commonly applied in real-world DevOps and SecOps monitoring environments:
+
+- **Prometheus** – System and service monitoring
+- **Grafana** – Metrics visualization and dashboards
+- **ELK Stack (Elasticsearch, Logstash, Kibana)** – Log management and analysis
+- **Splunk** – Enterprise log monitoring and security analytics
+- **Fail2Ban** – Intrusion prevention based on log analysis
+
+---
+
+## 📂 Project Structure
+
+---
+
+## 🎥 Demo Video
+
+A short demonstration video showing:
+
+- Service status monitoring
+- Log filtering (Warning / Error)
+- Alert generation for stopped services
+
+📁 **Location:** `docs/Video_2026-01-20_180132.mp4`
